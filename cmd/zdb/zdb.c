@@ -6178,6 +6178,8 @@ zdb_leak_fini(spa_t *spa, zdb_cb_t *zcb)
 
 		for (uint64_t m = 0; m < vd->vdev_ms_count; m++) {
 			metaslab_t *msp = vd->vdev_ms[m];
+
+			mutex_enter(&msp->ms_lock);
 			ASSERT3P(msp->ms_group, ==, (msp->ms_group->mg_class ==
 			    spa_embedded_log_class(spa)) ?
 			    vd->vdev_log_mg : vd->vdev_mg);
@@ -6205,6 +6207,7 @@ zdb_leak_fini(spa_t *spa, zdb_cb_t *zcb)
 			if (msp->ms_loaded) {
 				msp->ms_loaded = B_FALSE;
 			}
+			mutex_exit(&msp->ms_lock);
 		}
 	}
 
